@@ -13,6 +13,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <snakeyaml.version>1.0</snakeyaml.version>
+        <props2yaml.version>0.5</props2yaml.version>
         <lombok.version>1.18.2</lombok.version>
         <junit.version>4.12</junit.version>
     </properties>
@@ -23,6 +24,13 @@
             <groupId>org.snakeyaml</groupId>
             <artifactId>snakeyaml-engine</artifactId>
             <version>${snakeyaml.version}</version>
+        </dependency>
+
+        <!-- props2yaml -->
+        <dependency>
+            <groupId>io.codearte.props2yaml</groupId>
+            <artifactId>props2yaml</artifactId>
+            <version>${props2yaml.version}</version>
         </dependency>
 
         <!-- Lombok -->

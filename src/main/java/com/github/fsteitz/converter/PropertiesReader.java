@@ -16,10 +16,14 @@
 package com.github.fsteitz.converter;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 
+import com.github.fsteitz.converter.writer.PropertiesWriter;
+import com.github.fsteitz.converter.writer.YamlWriter;
+import io.codearte.props2yaml.Props2YAML;
 import lombok.NonNull;
 import org.snakeyaml.engine.v1.api.Load;
 import org.snakeyaml.engine.v1.api.LoadSettings;
@@ -34,38 +38,39 @@ public class PropertiesReader
    private Load load = new Load(settings);
 
    /**
-    * @param inputStream
+    * @param fileName
     * @return
     */
-   public Properties readFlattenedYaml(@NonNull InputStream inputStream)
+   public PropertyContext readFlattenedYaml(@NonNull String fileName) throws IOException
    {
-      return PropertiesFlattener.flatten(readYaml(inputStream));
+      PropertyContext propertyContext = readYaml(fileName);
+      return new PropertyContext(PropertiesFlattener.flatten(propertyContext.getProperties()), propertyContext.getWriter());
    }
 
    /**
-    * @param inputStream
+    * @param fileName
     */
-   public Properties readYaml(@NonNull InputStream inputStream)
+   public PropertyContext readYaml(@NonNull String fileName) throws IOException
    {
-      Object object = load.loadFromInputStream(inputStream);
+      Object object = load.loadFromInputStream(Files.newInputStream(Paths.get(fileName)));
 
       if( !(object instanceof Map) )
       {
          throw new IllegalArgumentException("Read properties file must be representable as a map");
       }
 
-      return toProperties((Map) object);
+      return createContext(toProperties((Map) object));
    }
 
    /**
-    * @param inputStream
+    * @param fileName
     */
-   public Properties readProperties(@NonNull InputStream inputStream) throws IOException
+   public PropertyContext readProperties(@NonNull String fileName) throws IOException
    {
-      Properties properties = new Properties();
-      properties.load(inputStream);
+      Props2YAML props2YAML = Props2YAML.fromFile(Paths.get(fileName));
+      Map<Object, Object> yaml = (Map<Object, Object>) load.loadFromString(props2YAML.convert());
 
-      return properties;
+      return new PropertyContext(yaml, new YamlWriter(yaml));
    }
 
    /**
@@ -78,5 +83,14 @@ public class PropertiesReader
       properties.putAll(propertiesMap);
 
       return properties;
+   }
+
+   /**
+    * @param properties
+    * @return
+    */
+   private PropertyContext createContext(Properties properties)
+   {
+      return new PropertyContext(properties, new PropertiesWriter(properties));
    }
 }

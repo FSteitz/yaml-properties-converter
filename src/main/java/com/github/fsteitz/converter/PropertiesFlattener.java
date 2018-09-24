@@ -42,7 +42,7 @@ public final class PropertiesFlattener
     * @param properties
     * @return
     */
-   public static Properties flatten(Properties properties)
+   public static Properties flatten(Map<Object, Object> properties)
    {
       Collection<KeyValuePair> keyValuePairs = new ArrayList<>();
       flatten(keyValuePairs, new KeyValuePairBuilder(), properties);
