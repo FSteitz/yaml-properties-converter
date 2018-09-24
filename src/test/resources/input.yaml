@@ -1,0 +1,11 @@
+my:
+  custom:
+    properties:
+      key1: my-key1
+      key2: my-key2
+
+some:
+  list:
+    - item1
+    - item2
+    - item3
